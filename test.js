@@ -33,7 +33,6 @@ db.once('open', function() {
 			.then((word) => {
 				console.log("REMOVED : ", word)
 
-
 				// try to refind the word
 				WordManager.find(value, lang)
 				.then((word) => {

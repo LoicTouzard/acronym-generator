@@ -7,12 +7,12 @@ const mongoose = require('mongoose')
  * Manage the communication with MongoDB for Word Object
  */
 class WordManager{
-	construct(options={}){
-		optionsDefault = {
+	constructor(options={}){
+		let optionsDefault = {
 			lang: "en",
 			preposition: "",
 			type: "",
-			position: Word.POSITION.ANYWHERE
+			position: Word.POSITION().ANYWHERE
 		}
 		if(typeof options !== 'undefined' && typeof options.default !== 'undefined'){
 			// merge user's optionsDefault with class default
@@ -30,7 +30,7 @@ class WordManager{
 	 * @param {String} lang        	The Word's lang -- default is "en"
 	 * @param {String} preposition 	The preposition which fit the word if necessary : "de", "d'", ... -- default is ""
 	 * @param {String} type        	The Word's type : "noun", "adjective", ... -- default is "noun"
-	 * @param {String} position 	The prefered position of the word in acronyms : Word.POSITION.ANYWHERE is anywhere, Word.POSITION.START is start, Word.POSITION.MIDDLE is middle, Word.POSITION is end. -- default is Word.POSITION.ANYWHERE
+	 * @param {String} position 	The prefered position of the word in acronyms : Word.POSITION().ANYWHERE is anywhere, Word.POSITION().START is start, Word.POSITION().MIDDLE is middle, Word.POSITION() is end. -- default is Word.POSITION().ANYWHERE
 	 *                             	If The type is "adjective" the default position depends of the lang.
 	 * @return {Promise} 			The Promise handling the Word creation
 	 */
@@ -40,16 +40,16 @@ class WordManager{
 			type=this._defaultType,
 			position=this._defaultPosition){
 
-		if(type == 'adjective' && position == Word.POSITION.ANYWHERE){
+		if(type == 'adjective' && position == Word.POSITION().ANYWHERE){
 			switch(lang){
 				case 'fr':
-					position = Word.POSITION.END
+					position = Word.POSITION().END
 					break
 				case 'en':
-					position = Word.POSITION.START
+					position = Word.POSITION().START
 					break
 				default :
-					position = Word.POSITION.ANYWHERE
+					position = Word.POSITION().ANYWHERE
 			}
 		}
 		let word = new Word({ value, lang, preposition, type, position})

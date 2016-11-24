@@ -16,15 +16,13 @@ wordSchema.index({ value: 1, lang: 1}, { unique: true })
 
 /**
  * Values to define the preferred position for a word
- * Use Word.POSITION.ANYWHERE when the word can fit anywhere in an acronym (default constructor value)
- * Use Word.POSITION.START when the word can only be placed at the beginning of the acronym
- * Use Word.POSITION.MIDDLE when the word can't be placed at the beginning, nor the end of an acronym
- * Use Word.POSITION.END when the word can only be placed at the end of the word
+ * Use Word.POSITION().ANYWHERE when the word can fit anywhere in an acronym (default constructor value)
+ * Use Word.POSITION().START when the word can only be placed at the beginning of the acronym
+ * Use Word.POSITION().MIDDLE when the word can't be placed at the beginning, nor the end of an acronym
+ * Use Word.POSITION().END when the word can only be placed at the end of the word
  * @type {Object}
  */
-wordSchema.static('POSITION', () =>
-	({'ANYWHERE':'ANY', 'START':'START', 'MIDDLE':'MID', 'END':'END'})
-);
+wordSchema.statics.POSITION = () => ({'ANYWHERE':'ANY', 'START':'START', 'MIDDLE':'MID', 'END':'END'})
 
 /*
  * Return the first letter of the word uppercase
@@ -53,6 +51,6 @@ wordSchema.method('equalsTo', (word) =>
 		word.type == this.type
 )
 
-const WordModel = mongoose.model('ag_Word', wordSchema)
+let WordModel = mongoose.model('ag_Word', wordSchema)
 
 module.exports = WordModel
