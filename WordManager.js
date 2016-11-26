@@ -7,9 +7,21 @@ const mongoose = require('mongoose')
  * Manage the communication with MongoDB for Word Object
  */
 class WordManager{
+	/*
+	 * Construct the WordManagerClass.
+	 * Mongoose should be connected to database to use ths methods
+	 * @param {Object}	options 	Define the option for the construction
+	 *                          	Available options are :
+	 *                          	{
+	 *                          		default:{	// will be use as default for the word creation
+	 *                          			preposition: "",
+	 *                          			type: "",
+	 *                          			position: Word.POSITION().ANYWHERE
+	 *                          		}
+	 *                          	}
+	 */
 	constructor(options={}){
 		let optionsDefault = {
-			lang: "en",
 			preposition: "",
 			type: "",
 			position: Word.POSITION().ANYWHERE
@@ -18,7 +30,6 @@ class WordManager{
 			// merge user's optionsDefault with class default
 			Object.assign(optionsDefault, options.default)
 		}
-		this._defaultLang = optionsDefault.lang
 		this._defaultPreposition = optionsDefault.preposition
 		this._defaultType = optionsDefault.type
 		this._defaultPosition = optionsDefault.position
@@ -27,32 +38,16 @@ class WordManager{
 	/**
 	 * Create and save a Word
 	 * @param {String} value       	The word as String
-	 * @param {String} lang        	The Word's lang -- default is "en"
 	 * @param {String} preposition 	The preposition which fit the word if necessary : "de", "d'", ... -- default is ""
 	 * @param {String} type        	The Word's type : "noun", "adjective", ... -- default is "noun"
-	 * @param {String} position 	The prefered position of the word in acronyms : Word.POSITION().ANYWHERE is anywhere, Word.POSITION().START is start, Word.POSITION().MIDDLE is middle, Word.POSITION() is end. -- default is Word.POSITION().ANYWHERE
-	 *                             	If The type is "adjective" the default position depends of the lang.
+	 * @param {String} position 	The prefered position of the word in acronyms : Word.POSITION().ANYWHERE is anywhere, Word.POSITION().START is start, Word.POSITION().MIDDLE is middle, Word.POSITION().END is end. -- default is Word.POSITION().ANYWHERE
 	 * @return {Promise} 			The Promise handling the Word creation
 	 */
 	create(value,
-			lang=this._defaultLang,
 			preposition=this._defaultPreposition,
 			type=this._defaultType,
 			position=this._defaultPosition){
-
-		if(type == 'adjective' && position == Word.POSITION().ANYWHERE){
-			switch(lang){
-				case 'fr':
-					position = Word.POSITION().END
-					break
-				case 'en':
-					position = Word.POSITION().START
-					break
-				default :
-					position = Word.POSITION().ANYWHERE
-			}
-		}
-		let word = new Word({ value, lang, preposition, type, position})
+		let word = new Word({ value, preposition, type, position})
 		return word.save()
 	}
 
@@ -73,18 +68,27 @@ class WordManager{
 	 * @return {Promise}
 	 */
 	removeAll(){
-		return word.remove()
+		return Word.remove({})
 	}
 
 	/**
-	 * Find a word in the database having the given value and given lang
+	 * Find the word in the database having the given value
 	 * @param  {String} value the actual word String
-	 * @param  {String} lang  the lang of the word, default can be applied
 	 * @return {Promise}      Promise on the request to find the word
 	 */
-	find(value, lang=this._defaultLang){
-		return Word.findOne({ value: value, lang: lang })
+	findTheWord(value){
+		return Word.findOne({ value: value})
 	}
+
+	
+	findBeginingWithAtPosition(beginning, position){
+		return Word.find({ value: {$regex : "^" + beginning}, position: position})
+	}
+
+	get wordPositions(){
+		return Word.POSITION()
+	}
+
 }
 
 module.exports = {

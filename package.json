@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/LoicTouzard/acronym-generator#readme",
   "dependencies": {
+    "async": "^2.1.4",
     "mongoose": "^4.6.8"
   }
 }
