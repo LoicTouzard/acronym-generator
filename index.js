@@ -1,5 +1,5 @@
-const Generator = require('./Generator').Generator
-const WordManager = require('./WordManager').WordManager
+const Generator = require('./Generator')
+const WordManager = require('./WordManager')
 
 module.exports = {
 	Generator,

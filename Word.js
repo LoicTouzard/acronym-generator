@@ -10,18 +10,8 @@ let wordSchema = mongoose.Schema({
     position: String
 })
 
-// Compound index on value/type for unicity
-wordSchema.index({ value: 1, type: 1}, { unique: true })
-
-/**
- * Values to define the preferred position for a word
- * Use Word.POSITION().ANYWHERE when the word can fit anywhere in an acronym (default constructor value)
- * Use Word.POSITION().START when the word can only be placed at the beginning of the acronym
- * Use Word.POSITION().MIDDLE when the word can't be placed at the beginning, nor the end of an acronym
- * Use Word.POSITION().END when the word can only be placed at the end of the word
- * @type {Object}
- */
-wordSchema.statics.POSITION = () => ({'ANYWHERE':'ANY', 'START':'START', 'MIDDLE':'MID', 'END':'END'})
+// index on value for unicity
+wordSchema.index({ value: 1}, { unique: true })
 
 /*
  * Return the first letter of the word uppercase
@@ -45,8 +35,15 @@ wordSchema.method('startWithVowel', function(){
  * @return {boolean}      True if the Word is equal to the current Word, else false.
  */
 wordSchema.method('equalsTo', function(word){
-	return word.value == this.value && word.type == this.type
+	return word.value == this.value
 })
+
+// pre save middleware, upperCase the first letter
+wordSchema.pre('save', function (next) {
+  this.value = this.first() + this.value.substr(1)
+  next()
+})
+
 
 let WordModel = mongoose.model('ag_Word', wordSchema)
 

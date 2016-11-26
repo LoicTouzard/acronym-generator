@@ -15,16 +15,16 @@ class WordManager{
 	 *                          	{
 	 *                          		default:{	// will be use as default for the word creation
 	 *                          			preposition: "",
-	 *                          			type: "",
-	 *                          			position: Word.POSITION().ANYWHERE
+	 *                          			type: OTHER,	//given by WordManager.wordPositions
+	 *                          			position: ANYWHERE // given by WordManager.wordTypes
 	 *                          		}
 	 *                          	}
 	 */
 	constructor(options={}){
 		let optionsDefault = {
 			preposition: "",
-			type: "",
-			position: Word.POSITION().ANYWHERE
+			type: WordManager.wordTypes.OTHER,
+			position: WordManager.wordPositions.ANYWHERE
 		}
 		if(typeof options !== 'undefined' && typeof options.default !== 'undefined'){
 			// merge user's optionsDefault with class default
@@ -85,12 +85,32 @@ class WordManager{
 		return Word.find({ value: {$regex : "^" + beginning}, position: position})
 	}
 
-	get wordPositions(){
-		return Word.POSITION()
+	/**
+	 * Values to define the preferred position of a word
+	 * Use ANYWHERE when the word can fit anywhere in an acronym (default constructor value)
+	 * Use START when the word can only be placed at the beginning of the acronym
+	 * Use MIDDLE when the word can't be placed at the beginning, nor the end of an acronym
+	 * Use END when the word can only be placed at the end of the word
+	 * @type {Object}
+	 */
+	static get wordPositions(){
+		return {'ANYWHERE':'ANY', 'START':'START', 'MIDDLE':'MID', 'END':'END'}
+	}
+
+	/**
+	 * Values to defined the type of a word
+	 * NOUN : type is noun
+	 * ADJECTIVE : type is adjective
+	 * ADVERB : type is adverb
+	 * VERB_CONJUGATED : type is a verb conjugated TO THE 3RD PERSON SINGULAR
+	 * VERB_INFINITIV : type is a verb in infinitiv form
+	 * OTHER : If the word doesn't fit anything
+	 * @type {Object}
+	 */
+	static get wordTypes() {
+		return {'NOUN':'NOUN', 'ADJECTIVE':'ADJ', 'ADVERB':'ADVB', 'VERB_CONJUGATED':'VB_CJGT', 'VERB_INFITIVE':'VB_INF', 'OTHER':'OTHER'}
 	}
 
 }
 
-module.exports = {
-	WordManager
-}
+module.exports = WordManager

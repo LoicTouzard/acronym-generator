@@ -59,7 +59,7 @@ function test2(WM, GEN){
 	})
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
-		return GEN.getAcronym(acronym)
+		return GEN.acronymizeWords(acronym)
 	})
 	.then((response) =>{
 		console.log("GOT ACRONYM RESPONSE : ",response)
@@ -69,12 +69,39 @@ function test2(WM, GEN){
 }
 
 function test3(WM, GEN){
-	const acronym = "AA"
+	const acronym = "ABC"
 
 	WM.create("Algorithme")
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
-		return GEN.getAcronym(acronym)
+		return WM.create("Binaire")
+	})
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return WM.create("Baignoire")
+	})
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return WM.create("Concentré")
+	})
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return GEN.acronymize(acronym)
+	})
+	.then((response) =>{
+		console.log("GOT ACRONYM RESPONSE : ",response)
+		end()
+	})
+	.catch(endError)
+}
+
+function test4(WM, GEN){
+	const acronym = "aa"
+
+	WM.create("algorithme")
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return GEN.acronymizeWords(acronym)
 	})
 	.then((response) =>{
 		console.log("GOT ACRONYM RESPONSE : ",response)
