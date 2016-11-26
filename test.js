@@ -1,107 +1,108 @@
 'use strict'
-const Module = require('./index.js')
 const mongoose = require('mongoose');
-
-
+const AcronymGenerator = require('./index.js')
+const clearDB = require('./WordManager').removeAll
+const positions = AcronymGenerator.positions
+const types = AcronymGenerator.types
 
 mongoose.connect('mongodb://localhost/AG_test');
-const db = mongoose.connection
 mongoose.Promise = global.Promise
+const db = mongoose.connection
 
 const end = () => mongoose.disconnect()
 const endError = (err) => {console.error(err);end()}
 
-function test1(WM){
-	const value = "bnaa"
-	const pos = WM.wordPositions
+
+function creationTest(){
+	const value = "Diagram"
+	const options = {
+		position: positions.END,
+		type: types.NOUN,
+		preposition: ""
+	}
 	// create a word
-	WM.create(value)
+	AcronymGenerator.addWord(value, options)
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
-
-		//find a word
-		return WM.findTheWord(value)
+		end()
 	})
-	.then((wordFound) => {
-		console.log("FOUND : ", wordFound)
+	.catch(endError)
+}
 
-		//remove the word
-		return WM.remove(wordFound)
+function deletionByValueTest(){
+	const value = "Diagram"
+	// create a word
+	AcronymGenerator.addWord(value)
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return AcronymGenerator.removeWord(value)
 	})
 	.then((wordRemoved) => {
 		console.log("REMOVED : ", wordRemoved)
-
-		// try to refind the word
-		return WM.findTheWord(value)
-	})
-	.then((wordFound) => {
-		console.log("FOUND : ", wordFound)
 		end()
 	})
 	.catch(endError)
 }
 
-function test2(WM, GEN){
+function deletionByObjectTest(){
+	const value = "Diagram"
+	// create a word
+	AcronymGenerator.addWord(value)
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return AcronymGenerator.removeWord(wordCreated)
+	})
+	.then((wordRemoved) => {
+		console.log("REMOVED : ", wordRemoved)
+		end()
+	})
+	.catch(endError)
+}
+
+function acronymTest(WM, GEN){
 	const acronym = "ABC"
 
-	WM.create("Algorithme")
+	AcronymGenerator.addWord("Algorithme")
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
-		return WM.create("Binaire")
+		return AcronymGenerator.addWord("Binaire")
 	})
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
-		return WM.create("Baignoire")
+		return AcronymGenerator.addWord("Baignoire")
 	})
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
-		return WM.create("Concentré")
+		return AcronymGenerator.addWord("Concentré")
 	})
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
-		return GEN.acronymizeWords(acronym)
+		return AcronymGenerator.getAcronym(acronym)
 	})
-	.then((response) =>{
+	.then((response) => {
 		console.log("GOT ACRONYM RESPONSE : ",response)
 		end()
 	})
 	.catch(endError)
 }
 
-function test3(WM, GEN){
+function impossibleAcronymTest(WM, GEN){
 	const acronym = "ABC"
-
-	WM.create("Algorithme")
-	.then((wordCreated) => {
-		console.log("SAVED : ", wordCreated)
-		return WM.create("Binaire")
-	})
-	.then((wordCreated) => {
-		console.log("SAVED : ", wordCreated)
-		return WM.create("Baignoire")
-	})
-	.then((wordCreated) => {
-		console.log("SAVED : ", wordCreated)
-		return WM.create("Concentré")
-	})
-	.then((wordCreated) => {
-		console.log("SAVED : ", wordCreated)
-		return GEN.acronymize(acronym)
-	})
-	.then((response) =>{
+	AcronymGenerator.getAcronym(acronym)
+	.then((response) => {
 		console.log("GOT ACRONYM RESPONSE : ",response)
 		end()
 	})
 	.catch(endError)
 }
 
-function test4(WM, GEN){
+function noRepetitionAcronymTest(WM, GEN){
 	const acronym = "aa"
 
-	WM.create("algorithme")
+	AcronymGenerator.addWord("Algorithme")
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
-		return GEN.acronymizeWords(acronym)
+		return AcronymGenerator.getAcronym(acronym)
 	})
 	.then((response) =>{
 		console.log("GOT ACRONYM RESPONSE : ",response)
@@ -113,13 +114,15 @@ function test4(WM, GEN){
 
 db.once('open', () => {
 	// Create / Find / Remove test
-	const WordManager = new Module.WordManager()
-	const Generator = new Module.Generator()
 
-	WordManager.removeAll()
-	.then(() => {
-		console.log("DATABASE CLEAR")
-		test3(WordManager, Generator)
+	clearDB().then(() => {
+		console.log("DATABASE CLEARED")
+		// creationTest()
+		// deletionByValueTest()
+		// deletionByObjectTest()*
+		// acronymTest()
+		// impossibleAcronymTest()
+		noRepetitionAcronymTest()
 	})
 	.catch(endError)
 })

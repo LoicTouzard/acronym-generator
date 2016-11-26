@@ -21,44 +21,87 @@ class WordManager{
 	 *                          	}
 	 */
 	constructor(options={}){
-		let optionsDefault = {
+		this._optionsDefault = {
 			preposition: "",
 			type: WordManager.wordTypes.OTHER,
 			position: WordManager.wordPositions.ANYWHERE
 		}
 		if(typeof options !== 'undefined' && typeof options.default !== 'undefined'){
-			// merge user's optionsDefault with class default
-			Object.assign(optionsDefault, options.default)
+			// merge user's _optionsDefault with class default
+			this._optionsDefault = Object.assign(this._optionsDefault, options.default)
 		}
-		this._defaultPreposition = optionsDefault.preposition
-		this._defaultType = optionsDefault.type
-		this._defaultPosition = optionsDefault.position
+	}
+
+
+	_valueInObject(value, object){
+		for(let prop in object){
+			if(object.hasOwnProperty(prop) && object[prop] === value){
+				return true
+			}
+		}
+		return false
+	}
+
+	_validOptions(options){
+		if(typeof options.preposition !== "undefined" &&
+			typeof options.preposition !== "string"){
+			return false
+		}
+		if(typeof options.type !== "undefined" &&
+			!this._valueInObject(options.type, WordManager.wordTypes)){
+			return false
+		}
+		if(typeof options.position !== "undefined" &&
+			!this._valueInObject(options.position, WordManager.wordPositions)){
+			return false
+		}
+		return true
 	}
 
 	/**
 	 * Create and save a Word
 	 * @param {String} value       	The word as String
-	 * @param {String} preposition 	The preposition which fit the word if necessary : "de", "d'", ... -- default is ""
-	 * @param {String} type        	The Word's type : "noun", "adjective", ... -- default is "noun"
-	 * @param {String} position 	The prefered position of the word in acronyms : Word.POSITION().ANYWHERE is anywhere, Word.POSITION().START is start, Word.POSITION().MIDDLE is middle, Word.POSITION().END is end. -- default is Word.POSITION().ANYWHERE
+	 * @param {Object} details 		An Object containing the differents additionnal details of the word
+	 *                           	Structured as : (everything is facultative, default values will be used)
+	 *                           	{
+	 *                           		preposition : {String}	The preposition which fit the word if necessary : "de", "d'", ... -- default is ""
+	 *                           		type: {String}			The Word's type : takes values from WordManager.wordTypes -- default is "OTHER"
+	 *                           		position: {String}		The Word's prefered position in an acronym : takes values from WordManager.wordPositions -- default is "ANYWHERE"
+	 *                           	}
 	 * @return {Promise} 			The Promise handling the Word creation
 	 */
-	create(value,
-			preposition=this._defaultPreposition,
-			type=this._defaultType,
-			position=this._defaultPosition){
-		let word = new Word({ value, preposition, type, position})
-		return word.save()
+	create(value, details={}){
+		const options = Object.assign({}, this._optionsDefault, details) // apply defaults
+		if(typeof value === "string" && value !== "" && this._validOptions(options)){
+			let word = new Word({
+				value: value,
+				preposition: options.preposition,
+				type: options.type,
+				position: options.position})
+			return word.save()
+		}
+		else{
+			return Promise.reject("Incorrect values to create a Word")
+		}
 	}
 
-
 	/**
-	 * Remove a Word Object from the database
+	 * Remove the given Word Object from the database
 	 * @param  {Word} word The Word to remove
 	 * @return {Promise}
 	 */
-	remove(word){
+	removeWord(word){
 		return word.remove()
+	}
+
+	/**
+	 * Remove the Word(s) having the given value from the database, or the word directly if a Word object is passed
+	 * @param  {Word or String} the Word to remove, or the string value of the word's) to remove
+	 * @return {Promise}
+	 */
+	remove(word){
+		if(word instanceof Word) return this.removeWord(word)
+		else return Word.remove({value:word})
 	}
 
 
@@ -67,7 +110,7 @@ class WordManager{
 	 * Remove all the Word Object from the database
 	 * @return {Promise}
 	 */
-	removeAll(){
+	static removeAll(){
 		return Word.remove({})
 	}
 
