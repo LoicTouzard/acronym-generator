@@ -101,7 +101,21 @@ class WordManager{
 	 */
 	remove(word){
 		if(word instanceof Word) return this.removeWord(word)
-		else return Word.remove({value:word})
+		else{
+			return new Promise((resolve,reject) => {
+				Word.findOne({value:word})
+				.then(wordFound => {
+					if(wordFound){
+						return this.removeWord(wordFound)
+					}
+					else{
+						reject(err)
+					}
+				})
+				.then(wordRemoved => resolve(wordRemoved))
+				.catch(err => reject(err))
+			})
+		}
 	}
 
 

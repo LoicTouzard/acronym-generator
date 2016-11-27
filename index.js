@@ -1,5 +1,6 @@
 const Generator = require('./Generator')
 const WordManager = require('./WordManager')
+const WordNotFoundError = require('./WordNotFoundError')
 
 function getAcronym(){
 	const G = new Generator()
@@ -22,5 +23,6 @@ module.exports = {
 	'addWord': addWord,
 	'removeWord': removeWord,
 	'positions': WordManager.wordPositions,
-	'types': WordManager.wordTypes
+	'types': WordManager.wordTypes,
+	'WordNotFoundError': WordNotFoundError
 } 

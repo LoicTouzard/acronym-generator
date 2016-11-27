@@ -5,7 +5,7 @@ const clearDB = require('./WordManager').removeAll
 const positions = AcronymGenerator.positions
 const types = AcronymGenerator.types
 
-mongoose.connect('mongodb://localhost/AG_test');
+mongoose.connect('mongodb://localhost/AG_test')
 mongoose.Promise = global.Promise
 const db = mongoose.connection
 
@@ -22,6 +22,33 @@ function creationTest(){
 	}
 	// create a word
 	AcronymGenerator.addWord(value, options)
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		end()
+	})
+	.catch(endError)
+}
+
+function creationErrorTest(){
+	const value = "Diagram"
+	const options = {
+		position: "a wrong value",
+		type: types.NOUN,
+		preposition: ""
+	}
+	// create a word
+	AcronymGenerator.addWord(value, options)
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		end()
+	})
+	.catch(endError)
+}
+
+function creationEmptyWordTest(){
+	const value = ""
+	// create a word
+	AcronymGenerator.addWord(value)
 	.then((wordCreated) => {
 		console.log("SAVED : ", wordCreated)
 		end()
@@ -59,7 +86,7 @@ function deletionByObjectTest(){
 	.catch(endError)
 }
 
-function acronymTest(WM, GEN){
+function acronymTest(){
 	const acronym = "ABC"
 
 	AcronymGenerator.addWord("Algorithme")
@@ -86,7 +113,7 @@ function acronymTest(WM, GEN){
 	.catch(endError)
 }
 
-function impossibleAcronymTest(WM, GEN){
+function impossibleAcronymTest(){
 	const acronym = "ABC"
 	AcronymGenerator.getAcronym(acronym)
 	.then((response) => {
@@ -96,7 +123,7 @@ function impossibleAcronymTest(WM, GEN){
 	.catch(endError)
 }
 
-function noRepetitionAcronymTest(WM, GEN){
+function noRepetitionAcronymTest(){
 	const acronym = "aa"
 
 	AcronymGenerator.addWord("Algorithme")
@@ -111,18 +138,48 @@ function noRepetitionAcronymTest(WM, GEN){
 	.catch(endError)
 }
 
+function globalTest(){
+	const types = AcronymGenerator.types
+	const positions = AcronymGenerator.positions
+	let addWordPromises = [
+		AcronymGenerator.addWord("Algorithm",{type:types.NOUN}),
+		AcronymGenerator.addWord("Binary",{type:types.ADJECTIVE, position: positions.START}),
+		AcronymGenerator.addWord("Tree")
+	]
+
+	Promise.all(addWordPromises)
+	.then(wordsAdded => {
+		console.log("ADDED :", wordsAdded.join(' '))
+		return AcronymGenerator.getAcronym("BTA")
+	})
+	.then(acronym => {
+		console.log(acronym)
+		return AcronymGenerator.removeWord("Binary")
+	})
+	.then(wordRemoved => {
+		console.log("REMOVED :", wordRemoved)
+		mongoose.disconnect()
+		Promise.resolve()
+	})
+	.catch(err => {
+		console.error(err)
+		mongoose.disconnect()
+		Promise.reject()
+	})
+}
 
 db.once('open', () => {
-	// Create / Find / Remove test
-
 	clearDB().then(() => {
 		console.log("DATABASE CLEARED")
 		// creationTest()
+		// creationErrorTest()
+		// creationEmptyWordTest()
 		// deletionByValueTest()
-		// deletionByObjectTest()*
+		// deletionByObjectTest()
 		// acronymTest()
 		// impossibleAcronymTest()
-		noRepetitionAcronymTest()
+		// noRepetitionAcronymTest()
+		//globalTest()
 	})
 	.catch(endError)
 })

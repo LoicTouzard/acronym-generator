@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 const async = require('async')
 const WordManager = require('./WordManager')
-const WordNotFoundException = require('./WordNotFoundException')
+const WordNotFoundError = require('./WordNotFoundError')
 
 class Generator {
 	constructor(){
@@ -15,7 +15,7 @@ class Generator {
 	 * @return {Promise}     The words chosen by the generator for each letter, in order
 	 *                           If the Promise is resolved : an array of the chosen words is passed to the callback
 	 *                           If the Promise is rejected : an error is passed to the callback
-	 *                           	The error can be a db error or a WordNotFoundException if the geerator couldn't find a word for a specific letter
+	 *                           	The error can be a db error or a WordNotFoundError if the geerator couldn't find a word for a specific letter
 	 */
 	acronymWords(text){
 		return new Promise((resolve, reject) =>{
@@ -52,7 +52,7 @@ class Generator {
 								}
 							}
 						}
-						if(chosenWord === undefined) callback(new WordNotFoundException("No word found for letter "+letter, letter))
+						if(chosenWord === undefined) callback(new WordNotFoundError("No word found for letter "+letter, letter))
 					})
 					.catch(err => callback(err))
 				},
@@ -73,7 +73,7 @@ class Generator {
 	 * @param  {String} text The word to "Acronymize"
 	 * @return {Promise}     If the Promise is resolved : a string for the acronym is passed to the callback
 	 *                       If the Promise is rejected : an error is passed to the callback.
-	 *                       The error can be a db error or a WordNotFoundException if the geerator couldn't find a word for a specific letter
+	 *                       The error can be a db error or a WordNotFoundError if the geerator couldn't find a word for a specific letter
 	 */
 	acronymize(text){
 		return new Promise((resolve, reject) => {
