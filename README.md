@@ -4,6 +4,8 @@ Smartly generates acronyms from a words database you can fill.
 
 This module allows you generate acronyms and add or remove words in the database.  
 
+This project is inpired from another project of mine generating bullshit acronyms : [BAG](https://github.com/LoicTouzard/BAG). 
+It uses almost the same logic to generate acronyms, except that this module use a database to store and retreive words.   
 
 ## Install
 
