@@ -1,6 +1,6 @@
 {
   "name": "acronym-generator",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Smartly generate acronyms from a words database",
   "main": "index.js",
   "scripts": {
