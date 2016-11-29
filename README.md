@@ -203,7 +203,7 @@ console.log(AG.types)
     'ADJECTIVE':'ADJ',
     'ADVERB':'ADVB',
     'VERB_CONJUGATED':'VB_CJGT',
-    'VERB_INFITIVE':'VB_INF',
+    'VERB_INFINITIVE':'VB_INF',
     'OTHER':'OTHER'
 } */
 ```

@@ -160,12 +160,12 @@ class WordManager{
 	 * ADJECTIVE : type is adjective
 	 * ADVERB : type is adverb
 	 * VERB_CONJUGATED : type is a verb conjugated TO THE 3RD PERSON SINGULAR
-	 * VERB_INFINITIV : type is a verb in infinitiv form
+	 * VERB_INFINITIVE : type is a verb in infinitiv form
 	 * OTHER : If the word doesn't fit anything
 	 * @type {Object}
 	 */
 	static get wordTypes() {
-		return {'NOUN':'NOUN', 'ADJECTIVE':'ADJ', 'ADVERB':'ADVB', 'VERB_CONJUGATED':'VB_CJGT', 'VERB_INFITIVE':'VB_INF', 'OTHER':'OTHER'}
+		return {'NOUN':'NOUN', 'ADJECTIVE':'ADJ', 'ADVERB':'ADVB', 'VERB_CONJUGATED':'VB_CJGT', 'VERB_INFINITIVE':'VB_INF', 'OTHER':'OTHER'}
 	}
 
 }
