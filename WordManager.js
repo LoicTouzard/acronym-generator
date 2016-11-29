@@ -58,6 +58,12 @@ class WordManager{
 		return true
 	}
 
+	_removeEmpty(obj){
+		Object.keys(obj).forEach((key) =>
+		   (obj[key] === undefined || obj[key] === null) && delete obj[key])
+		return obj
+	}
+
 	/**
 	 * Create and save a Word
 	 * @param {String} value       	The word as String
@@ -71,6 +77,7 @@ class WordManager{
 	 * @return {Promise} 			The Promise handling the Word creation
 	 */
 	create(value, details={}){
+		details = this._removeEmpty(details)
 		const options = Object.assign({}, this._optionsDefault, details) // apply defaults
 		if(typeof value === "string" && value !== "" && this._validOptions(options)){
 			let word = new Word({
