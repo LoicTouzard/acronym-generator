@@ -159,9 +159,9 @@ class WordManager{
 	 */
 	has(value){
 		return new Promise((resolve,reject) => {
-			this.find(value)
-			.then(() => resolve(!!value))
-			.catch(() => reject())
+			Word.findOne({ value: { $regex: new RegExp("^" + this._regexEscape(value) + "$", "i") }})
+			.then(wordFound => resolve(!!wordFound))
+			.catch(err => reject(err))
 		})
 	}
 	
