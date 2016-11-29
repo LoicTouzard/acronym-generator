@@ -160,8 +160,8 @@ class WordManager{
 	has(value){
 		return new Promise((resolve,reject) => {
 			this.find(value)
-			.then(() => resolve(true))
-			.catch(() => reject(false))
+			.then(() => resolve(!!value))
+			.catch(() => reject())
 		})
 	}
 	
