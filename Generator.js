@@ -91,7 +91,7 @@ class Generator {
 	 * @return {String}       A string containing the words join with their preposition
 	 */
 	_wordsToAcronym(words){
-		return words.map((w,i) => i==0 ? w.value : w.preposition + w.value).join(' ');
+		return words.map((w,i) => i==0 ? w.value : w.preposition + (w.preposition?' ':'') + w.value).join(' ');
 	}
 
 	/**
