@@ -17,12 +17,23 @@ function removeWord(){
 	return WM.remove(...arguments)
 }
 
+function hasWord(){
+	const WM = new WordManager()
+	return WM.has(...arguments)
+}
+
+function findWordsBeginningWith(){
+	const WM = new WordManager()
+	return WM.findBeginingWith(...arguments)
+}
 
 module.exports = {
 	'getAcronym': getAcronym,
 	'addWord': addWord,
 	'removeWord': removeWord,
+	'hasWord': hasWord,
+	'findWordsBeginningWith': findWordsBeginningWith,
 	'positions': WordManager.wordPositions,
 	'types': WordManager.wordTypes,
-	'WordNotFoundError': WordNotFoundError
+	'WordNotFoundError': WordNotFoundError,
 } 

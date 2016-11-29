@@ -38,9 +38,9 @@ wordSchema.method('equalsTo', function(word){
 	return word.value == this.value
 })
 
-// pre save middleware, upperCase the first letter
+// pre save middleware, upperCase the first letter, lowerCase the rest
 wordSchema.pre('save', function (next) {
-  this.value = this.first() + this.value.substr(1)
+  this.value = this.first() + this.value.substr(1).toLowerCase()
   next()
 })
 

@@ -14,6 +14,7 @@ const endError = (err) => {console.error(err);end()}
 
 
 function creationTest(){
+	console.log("CREAT")
 	const value = "Diagram"
 	const options = {
 		position: positions.END,
@@ -81,6 +82,58 @@ function deletionByObjectTest(){
 	})
 	.then((wordRemoved) => {
 		console.log("REMOVED : ", wordRemoved)
+		end()
+	})
+	.catch(endError)
+}
+
+function hasWordTest(){
+	const value = "Diagram"
+	// create a word
+	AcronymGenerator.addWord(value)
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return AcronymGenerator.hasWord(value)
+	})
+	.then((has) => {
+		console.log("HAS WORD : ", has)
+		end()
+	})
+	.catch(endError)
+}
+
+function hasNotWordTest(){
+	const value1 = "Diagram"
+	const value2 = "Data"
+	// create a word
+	AcronymGenerator.addWord(value1)
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return AcronymGenerator.hasWord(value2)
+	})
+	.then((has) => {
+		console.log("HAS WORD : ", has)
+		end()
+	})
+	.catch(endError)
+}
+
+function findWordsBeginningWithTest(){
+	const value1 = "Diagram"
+	const value2 = "Data"
+	const letter = "D"
+	// create a word
+	AcronymGenerator.addWord(value1)
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return AcronymGenerator.addWord(value2)
+	})
+	.then((wordCreated) => {
+		console.log("SAVED : ", wordCreated)
+		return AcronymGenerator.findWordsBeginningWith(letter)
+	})
+	.then((words) => {
+		console.log("FOUND : ", words.map(w=>w.value).join(' '))
 		end()
 	})
 	.catch(endError)
@@ -176,10 +229,13 @@ db.once('open', () => {
 		// creationEmptyWordTest()
 		// deletionByValueTest()
 		// deletionByObjectTest()
+		// hasWordTest()
+		// hasNotWordTest()
+		// findWordsBeginningWithTest()
 		// acronymTest()
 		// impossibleAcronymTest()
 		// noRepetitionAcronymTest()
-		//globalTest()
+		globalTest()
 	})
 	.catch(endError)
 })

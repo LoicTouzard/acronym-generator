@@ -103,15 +103,8 @@ class WordManager{
 		if(word instanceof Word) return this.removeWord(word)
 		else{
 			return new Promise((resolve,reject) => {
-				Word.findOne({value:word})
-				.then(wordFound => {
-					if(wordFound){
-						return this.removeWord(wordFound)
-					}
-					else{
-						reject(err)
-					}
-				})
+				this.find(word)
+				.then(wordFound => this.removeWord(wordFound))
 				.then(wordRemoved => resolve(wordRemoved))
 				.catch(err => reject(err))
 			})
@@ -128,18 +121,60 @@ class WordManager{
 		return Word.remove({})
 	}
 
+
+	_regexEscape(text){
+		return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")
+	}
 	/**
 	 * Find the word in the database having the given value
 	 * @param  {String} value the actual word String
 	 * @return {Promise}      Promise on the request to find the word
 	 */
-	findTheWord(value){
-		return Word.findOne({ value: value})
+	find(value){
+		return new Promise((resolve,reject) => {
+			Word.findOne({ value: { $regex: new RegExp("^" + this._regexEscape(value) + "$", "i") }})
+			.then(wordFound => {
+				if(wordFound){
+					resolve(wordFound)
+				}
+				else{
+					reject(err)
+				}
+			})
+			.catch(err => reject(err))
+		})
 	}
 
+	/**
+	 * Tell if the database has a word for this value
+	 * @param  {String} value the actual word String
+	 * @return {Promise}      Promise on the request resolving for true, rejecting for false
+	 */
+	has(value){
+		return new Promise((resolve,reject) => {
+			this.find(value)
+			.then(() => resolve(true))
+			.catch(() => reject(false))
+		})
+	}
 	
+	/**
+	 * Find the words in the database beginning with the given value and being at the given position
+	 * @param  {String} value 	 the actual word String
+	 * @param  {String} position the position of the word
+	 * @return {Promise}      Promise on the request to find the words
+	 */
 	findBeginingWithAtPosition(beginning, position){
-		return Word.find({ value: {$regex : "^" + beginning}, position: position})
+		return Word.find({ value: {$regex : new RegExp("^" + this._regexEscape(beginning), "i")}, position: position})
+	}
+
+	/**
+	 * Find the words in the database beginning with the given value
+	 * @param  {String} value 	 the actual word String
+	 * @return {Promise}      Promise on the request to find the words
+	 */
+	findBeginingWith(beginning){
+		return Word.find({ value: {$regex : new RegExp("^" + this._regexEscape(beginning), "i")}})
 	}
 
 	/**
