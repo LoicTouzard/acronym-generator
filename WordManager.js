@@ -199,6 +199,7 @@ class WordManager{
 	/**
 	 * Values to defined the type of a word
 	 * NOUN : type is noun
+	 * PROPER_NOUN : type is a proper noun
 	 * ADJECTIVE : type is adjective
 	 * ADVERB : type is adverb
 	 * VERB_CONJUGATED : type is a verb conjugated TO THE 3RD PERSON SINGULAR
@@ -207,7 +208,7 @@ class WordManager{
 	 * @type {Object}
 	 */
 	static get wordTypes() {
-		return {'NOUN':'NOUN', 'ADJECTIVE':'ADJ', 'ADVERB':'ADVB', 'VERB_CONJUGATED':'VB_CJGT', 'VERB_INFINITIVE':'VB_INF', 'OTHER':'OTHER'}
+		return {'NOUN':'NOUN', 'PROPER_NOUN':'PR_NOUN','ADJECTIVE':'ADJ', 'ADVERB':'ADVB', 'VERB_CONJUGATED':'VB_CJGT', 'VERB_INFINITIVE':'VB_INF', 'OTHER':'OTHER'}
 	}
 
 }

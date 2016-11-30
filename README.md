@@ -5,7 +5,23 @@ Smartly generates acronyms from a words database you can fill.
 This module allows you generate acronyms and add or remove words in the database.  
 
 This project is inpired from another project of mine generating bullshit acronyms : [BAG](https://github.com/LoicTouzard/BAG). 
-It uses almost the same logic to generate acronyms, except that this module use a database to store and retreive words.   
+It uses almost the same logic to generate acronyms, except that this module use a database to store and retreive words.  
+
+## Index
+
+[Install](#install)  
+[Full Example](#full-example)  
+[Full Example](#full-example)  
+[Usage and Documentation](#usage-and-documentation)  
+  [getAcronym(text)](#get-an-aronym)  
+  [addWord(word,details)](#add-a-word-to-the-database)  
+  [removeWord(word)](#remove-a-word-from-the-database)  
+  [hasWord(word)](#check-the-existence-of-a-word)  
+  [findWordsBeginningWith(letter)](#find-words-beginning-with-some-string)  
+  [positions](#positions)  
+  [types](#types)  
+  [WordNotFoundError](#wordNotFoundError-class)  
+
 
 ## Install
 
@@ -45,11 +61,11 @@ mongoose.connection.once('open', () => {
 
     Promise.all(addWordPromises) // execute all the addWord promises
     .then(wordsAdded => {
-        console.log("ADDED :", wordsAdded.join('\n'))
+        console.log("ADDED :", wordsAdded.)
         /* =>
-        ADDED : {value: 'Algorithm', preposition: '', type: 'NOUN', position: 'END'}
-                {value: 'Binary', preposition: '', type: 'ADJ', position: 'START'}
-                {value: 'Tree', preposition: '', type: 'NOUN', position: 'ANY'}
+        ADDED : [{value: 'Algorithm', preposition: '', type: 'NOUN', position: 'END'},
+                {value: 'Binary', preposition: '', type: 'ADJ', position: 'START'},
+                {value: 'Tree', preposition: '', type: 'NOUN', position: 'ANY'}]
         */
         return AG.getAcronym("BTA") // chain Promise with asking an acronym for "BTA"
     })
@@ -61,6 +77,11 @@ mongoose.connection.once('open', () => {
     .then(wordRemoved => {
         console.log("REMOVED :", wordRemoved)
         // => REMOVED : { value: 'Binary', preposition: '', type: 'ADJ', position: 'START'}
+        return AG.hasWord("Binary") // chain Promise with checking the existence of the word Binary
+    })
+    .then(has => {
+        console.log("HAS BINARY :", has)
+        // => HAS BINARY : false
         mongoose.disconnect()
         Promise.resolve()
     })
@@ -95,6 +116,38 @@ mongoose.connection.once('open', () => {
 ```
 
 For now on **the examples are assuming** you connected correctly to the database, and that the `mongoose.Promise` are set.  
+
+
+### Get an Acronym
+
+You can get an acronym made of the words from your database with :  
+```js
+getAcronym(text) // return Promise
+```
+
+The **parameter** is :  
+* `text` _{string}_ The word you want to find an acronym for.  
+
+**This function return** a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).  
+The `resolve` callback gets the acronym.  
+The `reject` callback gets a database error, or an instance of WordNotFoundError when the database has not enough word beginning by a specific letter needed in the algorithm.  
+**Note** : The algorithm doens't use the same word twice in the same acronym. The acronym for `"AA"` can't be `"Algorithm Algorithm"`.  
+
+#### Example
+
+```js
+const AG = require('acronym-generator')
+let text = "BTA"
+// assuming the words "Binary", "Tree" and "Algorithm" are in the database
+
+AG.getAcronym(text)
+.then(acronym => console.log("GOT ACRONYM : ", acronym)) // => "Binary Tree Algorithm"
+.catch(err => {
+    if(err instanceof AG.WordNotFoundError) console.error(err.message) // WordNotFoundError error
+    else console.error(err) // database error
+}) 
+```
+
 
 ### Add a word to the database
 
@@ -133,7 +186,7 @@ let details = {
     type: AG.types.NOUN,
     position: AG.position.END
 }
-AcronymGenerator.addWord(word, details)
+AG.addWord(word, details)
 .then((wordCreated) => console.log("SAVED : ", wordCreated))
 .catch((err) => console.error(err)) // db error or duplication error or an error because the input values were not correct
 ```
@@ -159,9 +212,68 @@ The `reject` callback gets a database error.
 const AG = require('acronym-generator')
 let word = "Algorithm"
 
-AcronymGenerator.removeWord(word)
+AG.removeWord(word)
 .then(wordRemoved => console.log("REMOVED : ", wordRemoved))
 .catch(err => console.error(err)) // db error, or the word wasn't found in database
+```
+
+
+### Check the existence of a word
+
+You can check if a word already exists in the database.  
+```js
+hasWord(word) // return Promise
+```
+
+The **parameter** is :  
+* `word` _{string}_ The string value of the word you want to check in the database.  
+
+**This function return** a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).  
+The `resolve` callback gets a boolean to `true` if the word exists, else `false`.  
+The `reject` callback gets a database error.  
+
+#### Example
+
+```js
+const AG = require('acronym-generator')
+let word = "Algorithm"
+
+AG.hasWord(word)
+.then(has => console.log("HAS : ", has)) // true / false
+.catch(err => console.error(err)) // db error
+```
+
+
+### Find words beginning with some string
+
+You can get all the words stored beginning with a given string :  
+```js
+findWordsBeginningWith(letter) // return Promise
+```
+
+The **parameter** is :  
+* `letter` _{string}_ The string (mostly letter) that you want to find words beginning with.  
+
+**This function return** a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).  
+The `resolve` callback gets an array of words beginning with th given letter. The length of the array can be 0 if there is no result.  
+The `reject` callback gets a database error.  
+
+#### Example
+
+```js
+const AG = require('acronym-generator')
+const letter = "A"
+// assuming the words "Algorithm" and "Acronym" are in the database
+
+AG.findWordsBeginningWith(letter)
+.then(words => console.log("GOT WORDS : ", words))
+/* =>
+    GOT WORDS : [{value: 'Algorithm', preposition: '', type: 'NOUN', position: 'END'},
+            {value: 'Acronym', preposition: '', type: 'NOUN', position: 'END'}]
+*/ 
+.catch(err => {
+    else console.error(err) // database error
+}) 
 ```
 
 
@@ -202,6 +314,7 @@ console.log(AG.types)
 /*=> 
 {
     'NOUN':'NOUN',
+    'PROPER_NOUN':'PR_NOUN',
     'ADJECTIVE':'ADJ',
     'ADVERB':'ADVB',
     'VERB_CONJUGATED':'VB_CJGT',
@@ -212,42 +325,13 @@ console.log(AG.types)
 
 Use thes values as following :  
 * `AG.types.NOUN` when the word's type is noun  
+* `AG.types.PROPER_NOUN` : when the word's type is a proper noun  
 * `AG.types.ADJECTIVE` when the word's type is adjective  
 * `AG.types.ADVERB` when the word's type is adverb  
 * `AG.types.VERB_CONJUGATED` when the word's type is a verb conjugated **to the 3rd person singular**  
 * `AG.types.VERB_INFINITIVE` when the word's type is a verb in infinitive form  
 * `AG.types.OTHER` when the word's type doesn't fit any of these  
 
-
-### Get an Acronym
-
-You can get an acronym made of the words from your database with :  
-```js
-getAcronym(text) // return Promise
-```
-
-The **parameter** is :  
-* `text` _{string}_ The word you want to find an acronym for.  
-
-**This function return** a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise).  
-The `resolve` callback gets the acronym.  
-The `reject` callback gets a database error, or an instance of WordNotFoundError when the database has not enough word beginning by a specific letter needed in the algorithm.  
-**Note** : The algorithm doens't use the same word twice in the same acronym. The acronym for `"AA"` can't be `"Algorithm Algorithm"`.  
-
-#### Example
-
-```js
-const AG = require('acronym-generator')
-let text = "BTA"
-// assuming the words "Binary", "Tree" and "Algorithm" are in the database
-
-AcronymGenerator.getAcronym(text)
-.then(acronym => console.log("GOT ACRONYM : ", acronym)) // => "Binary Tree Algorithm"
-.catch(err => {
-    if(err instanceof AG.WordNotFoundError) console.error(err.message) // WordNotFoundError error
-    else console.error(err) // database error
-}) 
-```
 
 ### WordNotFoundError class
 
